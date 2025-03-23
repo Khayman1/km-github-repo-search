@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 type Repo = {
   id: number;
@@ -20,30 +21,41 @@ export default function Home() {
   const [error, setError] = useState('');
   const [sortOption, setSortOption] = useState('updated');
   const [languageFilter, setLanguageFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setRepos([]);
+    setPage(1);
+    setHasMore(true);
     setSubmittedUser(username);
   };
 
   useEffect(() => {
+    if (!submittedUser) return;
+
     const fetchRepos = async () => {
       setLoading(true);
       setError('');
+
       try {
-        const data = await getUserRepos(submittedUser);
-        setRepos(data);
+        const newRepos = await getUserRepos(submittedUser, page, 10);
+
+        if (newRepos.length === 0) {
+          setHasMore(false);
+        }
+
+        setRepos((prev) => [...prev, ...newRepos]);
       } catch (err: any) {
-        setError(err.message || '에러가 발생했습니다.');
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    if (submittedUser) {
-      fetchRepos();
-    }
-  }, [submittedUser]);
+    fetchRepos();
+  }, [submittedUser, page]);
 
   const filteredRepos = repos
     .filter((repo) =>
@@ -55,7 +67,9 @@ export default function Home() {
         const starsB = b.stargazers_count ?? 0;
         return starsB - starsA;
       } else if (sortOption === 'updated') {
-        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        return (
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
       }
       return 0;
     });
@@ -105,21 +119,29 @@ export default function Home() {
         </div>
       )}
 
-      {loading && <p>로딩 중...</p>}
+      {loading && repos.length === 0 && <p>로딩 중...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      <ul className="w-full max-w-xl space-y-4">
-        {filteredRepos.map((repo) => (
-          <li key={repo.id} className="border p-4 rounded-md shadow">
-            <h2 className="text-lg font-semibold">{repo.name}</h2>
-            <p className="text-sm text-gray-600">{repo.description}</p>
-            <div className="text-sm text-gray-500">
-              ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{" "}
-              {new Date(repo.updated_at).toLocaleDateString()}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <InfiniteScroll
+        dataLength={repos.length}
+        next={() => setPage((prev) => prev + 1)}
+        hasMore={hasMore}
+        loader={<p>로딩 중...</p>}
+        endMessage={<p>모든 레포를 불러왔습니다.</p>}
+      >
+        <ul className="w-full max-w-xl space-y-4">
+          {filteredRepos.map((repo) => (
+            <li key={repo.id} className="border p-4 rounded-md shadow">
+              <h2 className="text-lg font-semibold">{repo.name}</h2>
+              <p className="text-sm text-gray-600">{repo.description}</p>
+              <div className="text-sm text-gray-500">
+                ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{' '}
+                {new Date(repo.updated_at).toLocaleDateString()}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </InfiniteScroll>
     </main>
   );
 }
