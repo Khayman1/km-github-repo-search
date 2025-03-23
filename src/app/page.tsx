@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import Link from 'next/link';
 
 type Repo = {
   id: number;
@@ -122,6 +123,7 @@ export default function Home() {
       {loading && repos.length === 0 && <p>로딩 중...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
+      {/* 무한 스크롤을 적용한 리스트 렌더링 부분 */}
       <InfiniteScroll
         dataLength={repos.length}
         next={() => setPage((prev) => prev + 1)}
@@ -131,17 +133,26 @@ export default function Home() {
       >
         <ul className="w-full max-w-xl space-y-4">
           {filteredRepos.map((repo) => (
-            <li key={repo.id} className="border p-4 rounded-md shadow">
-              <h2 className="text-lg font-semibold">{repo.name}</h2>
-              <p className="text-sm text-gray-600">{repo.description}</p>
-              <div className="text-sm text-gray-500">
-                ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{' '}
-                {new Date(repo.updated_at).toLocaleDateString()}
-              </div>
-            </li>
+            <Link
+              key={repo.id}
+              href={{
+                pathname: `/repos/${repo.name}`,
+                query: { user: submittedUser },
+              }}
+            >
+              <li className="border p-4 rounded-md shadow hover:bg-gray-100 cursor-pointer">
+                <h2 className="text-lg font-semibold">{repo.name}</h2>
+                <p className="text-sm text-gray-600">{repo.description}</p>
+                <div className="text-sm text-gray-500">
+                  ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{" "}
+                  {new Date(repo.updated_at).toLocaleDateString()}
+                </div>
+              </li>
+            </Link>
           ))}
         </ul>
       </InfiniteScroll>
+
     </main>
   );
 }
