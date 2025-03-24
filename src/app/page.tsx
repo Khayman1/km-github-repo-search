@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from 'next/link';
+// import './i18n'
+import { useTranslation } from 'react-i18next'
+import styled, { keyframes } from 'styled-components';
 
 type Repo = {
   id: number;
@@ -13,6 +16,157 @@ type Repo = {
   updated_at: string;
   language: string;
 };
+
+// 애니메이션 정의
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+// 전체 페이지 래퍼
+const Main = styled.main`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
+  animation: ${fadeIn} 0.8s ease;
+`;
+
+// 제목
+const Title = styled.h1`
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+`;
+
+// 검색 폼
+const Form = styled.form`
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  animation: ${fadeIn} 1s ease;
+`;
+
+// 입력창
+const Input = styled.input`
+  padding: 0.6rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  width: 250px;
+  transition: all 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+`;
+
+// 검색 버튼
+const Button = styled.button`
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background: linear-gradient(to right, #2563eb, #3b82f6);
+  }
+`;
+
+// 필터 영역
+const Filters = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  animation: ${fadeIn} 1.2s ease;
+`;
+
+const Select = styled.select`
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 1rem;
+  transition: box-shadow 0.3s;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+`;
+
+// 레포지토리 리스트
+const RepoList = styled.ul`
+  width: 100%;
+  max-width: 40rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: ${fadeIn} 1.3s ease;
+`;
+
+// 레포 아이템 박스
+const RepoItem = styled.li`
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.2rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background-color: #f1f5f9;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+
+  div {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+`;
+
+// 일반 메시지
+const Message = styled.p`
+  font-size: 0.9rem;
+  color: #475569;
+  animation: ${fadeIn} 0.5s ease;
+`;
+
+const ErrorMessage = styled.p`
+  font-size: 0.875rem;
+  color: #ef4444;
+`;
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -24,6 +178,7 @@ export default function Home() {
   const [languageFilter, setLanguageFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const { t } = useTranslation('translation');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +197,6 @@ export default function Home() {
 
       try {
         const newRepos = await getUserRepos(submittedUser, page, 10);
-
         if (newRepos.length === 0) {
           setHasMore(false);
         }
@@ -64,74 +218,55 @@ export default function Home() {
     )
     .sort((a, b) => {
       if (sortOption === 'stars') {
-        const starsA = a.stargazers_count ?? 0;
-        const starsB = b.stargazers_count ?? 0;
-        return starsB - starsA;
+        return (b.stargazers_count ?? 0) - (a.stargazers_count ?? 0);
       } else if (sortOption === 'updated') {
-        return (
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        );
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       }
       return 0;
     });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-6">
-      <h1 className="text-2xl font-bold mb-4">GitHub 사용자 검색</h1>
+    <Main>
+      <Title>GitHub 사용자 검색</Title>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-        <input
+      <Form onSubmit={handleSubmit}>
+        <Input
           type="text"
           placeholder="GitHub 사용자명 입력"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="px-4 py-2 border rounded-md"
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          검색
-        </button>
-      </form>
+        <Button type="submit">검색</Button>
+      </Form>
 
       {repos.length > 0 && (
-        <div className="flex gap-4 mb-6">
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="border rounded-md px-3 py-2"
-          >
+        <Filters>
+          <Select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
             <option value="updated">최근 업데이트 순</option>
             <option value="stars">별점 많은 순</option>
-          </select>
+          </Select>
 
-          <select
-            value={languageFilter}
-            onChange={(e) => setLanguageFilter(e.target.value)}
-            className="border rounded-md px-3 py-2"
-          >
+          <Select value={languageFilter} onChange={(e) => setLanguageFilter(e.target.value)}>
             <option value="all">모든 언어</option>
             <option value="JavaScript">JavaScript</option>
             <option value="TypeScript">TypeScript</option>
             <option value="Python">Python</option>
             <option value="HTML">HTML</option>
-          </select>
-        </div>
+          </Select>
+        </Filters>
       )}
 
-      {loading && repos.length === 0 && <p>로딩 중...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {loading && repos.length === 0 && <Message>로딩 중...</Message>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {/* 무한 스크롤을 적용한 리스트 렌더링 부분 */}
       <InfiniteScroll
         dataLength={repos.length}
         next={() => setPage((prev) => prev + 1)}
         hasMore={hasMore}
-        loader={<p>로딩 중...</p>}
-        endMessage={<p>모든 레포를 불러왔습니다.</p>}
+        loader={<Message></Message>}
+        endMessage={<Message>모든 레포를 불러왔습니다.</Message>}
       >
-        <ul className="w-full max-w-xl space-y-4">
+        <RepoList>
           {filteredRepos.map((repo) => (
             <Link
               key={repo.id}
@@ -140,19 +275,18 @@ export default function Home() {
                 query: { user: submittedUser },
               }}
             >
-              <li className="border p-4 rounded-md shadow hover:bg-gray-100 cursor-pointer">
-                <h2 className="text-lg font-semibold">{repo.name}</h2>
-                <p className="text-sm text-gray-600">{repo.description}</p>
-                <div className="text-sm text-gray-500">
+              <RepoItem>
+                <h2>{repo.name}</h2>
+                <p>{repo.description}</p>
+                <div>
                   ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{" "}
                   {new Date(repo.updated_at).toLocaleDateString()}
                 </div>
-              </li>
+              </RepoItem>
             </Link>
           ))}
-        </ul>
+        </RepoList>
       </InfiniteScroll>
-
-    </main>
+    </Main>
   );
 }
