@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
 import SearchBar from '@/components/SearchBar'; // Import SearchBar
 import RepoListComponent from '@/components/RepoList'; // Import the new RepoList component
+import RepoDetail from '@/components/RepoDetail'; // Import RepoDetail component
 import { Repo } from '../../types';
-
 
 // 애니메이션 및 스타일 정의 생략 (기존과 동일)...
 const fadeIn = keyframes`
@@ -75,6 +75,7 @@ export default function Home() {
   const [languageFilter, setLanguageFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
 
   const { t, i18n } = useTranslation();
   const lng = i18n.language;
@@ -148,6 +149,7 @@ export default function Home() {
       {loading && repos.length === 0 && <Message>{t('loading')}</Message>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
+      {/* RepoList Component */}
       <InfiniteScroll
         dataLength={repos.length}
         next={() => setPage((prev) => prev + 1)}
@@ -155,8 +157,17 @@ export default function Home() {
         loader={<Message />}
         endMessage={<Message>{t('endMessage')}</Message>}
       >
-        <RepoListComponent repos={filteredRepos} t={t} lng={lng} submittedUser={submittedUser} />
+        <RepoListComponent
+          repos={filteredRepos}
+          t={t}
+          lng={lng}
+          submittedUser={submittedUser}
+          onRepoClick={setSelectedRepo} // Passing down the selectedRepo setter function
+        />
       </InfiniteScroll>
+
+      {/* Display RepoDetail when a repo is selected */}
+      {selectedRepo && <RepoDetail repoName={selectedRepo} user={submittedUser} />}
     </Main>
   );
 }

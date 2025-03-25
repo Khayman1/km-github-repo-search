@@ -1,8 +1,17 @@
 // components/RepoList.tsx
 import React from 'react';
-import { Repo } from '../types'; // Define Repo type separately
+import { Repo } from '@/types'; // Ensure Repo type is defined
 import Link from 'next/link';
 import styled from 'styled-components';
+
+// Define the props for RepoListComponent
+type RepoListProps = {
+  repos: Repo[];
+  t: (key: string) => string;
+  lng: string;
+  submittedUser: string;
+  onRepoClick: React.Dispatch<React.SetStateAction<string | null>>;  // Add the onRepoClick prop
+};
 
 const RepoList = styled.ul`
   width: 100%;
@@ -46,14 +55,7 @@ const RepoItem = styled.li`
   }
 `;
 
-type RepoListProps = {
-  repos: Repo[];
-  t: (key: string) => string;
-  lng: string;
-  submittedUser: string;
-};
-
-const RepoListComponent = ({ repos, t, lng, submittedUser }: RepoListProps) => {
+const RepoListComponent: React.FC<RepoListProps> = ({ repos, t, lng, submittedUser, onRepoClick }) => {
   return (
     <RepoList>
       {repos.map((repo) => (
@@ -63,6 +65,7 @@ const RepoListComponent = ({ repos, t, lng, submittedUser }: RepoListProps) => {
             pathname: `/${lng}/repos/${repo.name}`, // Include language
             query: { user: submittedUser },
           }}
+          onClick={() => onRepoClick(repo.name)}  // Trigger onRepoClick when a repo is clicked
         >
           <RepoItem>
             <h2>{repo.name}</h2>
