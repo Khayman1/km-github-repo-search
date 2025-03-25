@@ -18,23 +18,23 @@ bash
 Copy
 Edit
 # 1. 저장소 클론
-git clone https://github.com/your-username/repo-name.git
+git clone https://github.com/your-username/km-github-repo-search.git
 
 # 2. 프로젝트 디렉토리 이동
-cd repo-name
+cd km-github-repo-search
 
 # 3. 의존성 설치
 npm install
+
+실행 >> npm run dev
+
 🚀 실행 방법
-bash
-Copy
-Edit
 npm run dev
 브라우저에서 아래 주소로 접속하면 앱이 실행됩니다:
 http://localhost:3000
 
 📚 사용 방법
-상단 검색 바에 GitHub 사용자 이름을 입력하세요.
+상단 검색 바에 GitHub 사용자 이름을 입력하세요. (예, foundation , ...)
 
 해당 사용자의 리포지토리가 자동으로 무한 스크롤을 통해 로드됩니다.
 
