@@ -10,17 +10,25 @@ const HeaderWrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.1rem 0.01rem;
-  background-color: #ffffff;
+  padding: 0rem 0.1rem;  // Adjusted padding for better spacing
   border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px skyblue;
+  background-color: #f0f9ff; 
 `;
 
 const Title = styled.h1`
-  font-size: 1.6rem;
-  font-weight: 520;
-  color: #0f172a;
-  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: grey;  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  // GitHub-like font
+  display: flex;
+  align-items: center;
+  gap: 10px;  // Space between logo and title
+`;
+
+const GitHubLogo = styled.img`
+  width: 30px;
+  height: 30px;
 `;
 
 const SelectorWrapper = styled.div`
@@ -57,7 +65,7 @@ const Dropdown = styled.ul`
   z-index: 999;
 `;
 
-const LangOption = styled.li`
+const LangOption = styled.ul`
   padding: 0.6rem 1.2rem;
   font-size: 0.9rem;
   color: #1e293b;
@@ -69,7 +77,6 @@ const LangOption = styled.li`
   }
 `;
 
-
 export default function Header() {
   const { t, i18n: i18nInstance } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -80,7 +87,12 @@ export default function Header() {
   };
 
   return (
-    <HeaderWrapper><Title>{t('searchTitle')}</Title><SelectorWrapper>
+    <HeaderWrapper>
+      <Title>
+        <GitHubLogo src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" />
+        {t('searchTitle')}
+      </Title>
+      <SelectorWrapper>
         <LangToggle onClick={() => setOpen(!open)}>
           🌐 {i18nInstance.language === 'ko' ? '한국어' : 'English'}
         </LangToggle>

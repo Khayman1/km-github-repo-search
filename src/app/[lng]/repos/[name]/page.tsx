@@ -23,19 +23,31 @@ export default async function RepoDetail({ params, searchParams }: Props) {
   const repo = await res.json();
 
   return (
-    <main className="max-w-xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">{repo.full_name}</h1>
-      <p className="text-gray-700 mb-4">{repo.description}</p>
+    <main className="max-w-4xl mx-auto py-10 px-6">
+      <h1 className="text-3xl font-semibold mb-6 text-center text-gray-900">{repo.full_name}</h1>
+      <p className="text-lg text-gray-600 mb-8 text-center">{repo.description}</p>
 
-      <ul className="text-sm text-gray-600 space-y-2">
-        <li>⭐ Star: {repo.stargazers_count}</li>
-        <li>🍴 Fork: {repo.forks_count}</li>
-        <li>📦 Language: {repo.language}</li>
-        <li>🐛 Open Issues: {repo.open_issues_count}</li>
-        <li>
-          🔗{' '}
+      <ul className="space-y-4 text-gray-700 text-sm">
+        <li className="flex justify-between">
+          <span>⭐ Star:</span>
+          <span>{repo.stargazers_count}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>🍴 Fork:</span>
+          <span>{repo.forks_count}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>📦 Language:</span>
+          <span>{repo.language}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>🐛 Open Issues:</span>
+          <span>{repo.open_issues_count}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>🔗 GitHub:</span>
           <a href={repo.html_url} target="_blank" className="text-blue-500 underline">
-            GitHub에서 보기
+            View on GitHub
           </a>
         </li>
       </ul>
