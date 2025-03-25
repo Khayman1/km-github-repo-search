@@ -5,6 +5,7 @@ import { getUserRepos } from '@/services/github';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import SearchBar from '@/components/SearchBar'; // Import SearchBar
 import styled, { keyframes } from 'styled-components';
 
 type Repo = {
@@ -15,7 +16,6 @@ type Repo = {
   updated_at: string;
   language: string;
 };
-
 // 애니메이션 및 스타일 정의 생략 (기존과 동일)...
 const fadeIn = keyframes`
   from {
@@ -36,44 +36,6 @@ const Main = styled.main`
   padding: 2rem;
   background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
   animation: ${fadeIn} 0.8s ease;
-`;
-
-const Form = styled.form`
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 2.5rem;
-  animation: ${fadeIn} 1s ease;
-`;
-
-const Input = styled.input`
-  padding: 0.6rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  width: 250px;
-  transition: all 0.3s;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-  }
-`;
-
-const Button = styled.button`
-  padding: 0.6rem 1.2rem;
-  background: linear-gradient(to right, #3b82f6, #60a5fa);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-
-  &:hover {
-    background: linear-gradient(to right, #2563eb, #3b82f6);
-  }
 `;
 
 const Filters = styled.div`
@@ -162,8 +124,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const { t, i18n } = useTranslation(); // namespace 생략 (기본 common)
-  const lng = i18n.language;  //현재 언어어
+  const { t, i18n } = useTranslation();
+  const lng = i18n.language;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,15 +173,8 @@ export default function Home() {
 
   return (
     <Main>
-      <Form onSubmit={handleSubmit}>
-        <Input
-          type="text"
-          placeholder={t('searchPlaceholder')}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <Button type="submit">{t('searchButton')}</Button>
-      </Form>
+      {/* Use the SearchBar component here */}
+      <SearchBar username={username} setUsername={setUsername} handleSubmit={handleSubmit} />
 
       {repos.length > 0 && (
         <Filters>
@@ -253,7 +208,7 @@ export default function Home() {
             <Link
               key={repo.id}
               href={{
-                pathname:`/${lng}/repos/${repo.name}`, //언어 포함
+                pathname: `/${lng}/repos/${repo.name}`, // Include language
                 query: { user: submittedUser },
               }}
             >

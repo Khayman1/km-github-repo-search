@@ -17,7 +17,7 @@ export default async function RepoDetail({ params, searchParams }: Props) {
   const res = await fetch(`https://api.github.com/repos/${user}/${name}`);
 
   if (!res.ok) {
-    notFound();
+    throw new Error('Failed to fetch repo details');
   }
 
   const repo = await res.json();
