@@ -1,21 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import SearchBar from '@/components/SearchBar'; // Import SearchBar
 import styled, { keyframes } from 'styled-components';
+import SearchBar from '@/components/SearchBar'; // Import SearchBar
+import RepoListComponent from '@/components/RepoList'; // Import the new RepoList component
+import { Repo } from '../../types';
 
-type Repo = {
-  id: number;
-  name: string;
-  description: string;
-  stargazers_count: number;
-  updated_at: string;
-  language: string;
-};
+
 // 애니메이션 및 스타일 정의 생략 (기존과 동일)...
 const fadeIn = keyframes`
   from {
@@ -59,58 +53,16 @@ const Select = styled.select`
   }
 `;
 
-const RepoList = styled.ul`
-  width: 100%;
-  max-width: 40rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  animation: ${fadeIn} 1.3s ease;
-`;
-
-const RepoItem = styled.ul`
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  padding: 1.2rem;
-  background-color: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  &:hover {
-    background-color: #f1f5f9;
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
-  }
-
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 0.3rem;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
-  }
-
-  div {
-    font-size: 0.8rem;
-    color: #94a3b8;
-  }
-`;
-
 const Message = styled.p`
   font-size: 0.9rem;
-  color: #475569;
-  animation: ${fadeIn} 0.5s ease;
+  color: #475569;  // Text color
+  animation: ${fadeIn} 0.5s ease;  // Applying fade-in animation
 `;
 
 const ErrorMessage = styled.p`
   font-size: 0.875rem;
-  color: #ef4444;
+  color: #ef4444;  // Red color for error text
+  animation: ${fadeIn} 0.5s ease;  // Applying fade-in animation
 `;
 
 export default function Home() {
@@ -203,26 +155,7 @@ export default function Home() {
         loader={<Message />}
         endMessage={<Message>{t('endMessage')}</Message>}
       >
-        <RepoList>
-          {filteredRepos.map((repo) => (
-            <Link
-              key={repo.id}
-              href={{
-                pathname: `/${lng}/repos/${repo.name}`, // Include language
-                query: { user: submittedUser },
-              }}
-            >
-              <RepoItem>
-                <h2>{repo.name}</h2>
-                <p>{repo.description}</p>
-                <div>
-                  ⭐ {repo.stargazers_count ?? 0} | {t('lastUpdated')}:{" "}
-                  {new Date(repo.updated_at).toLocaleDateString()}
-                </div>
-              </RepoItem>
-            </Link>
-          ))}
-        </RepoList>
+        <RepoListComponent repos={filteredRepos} t={t} lng={lng} submittedUser={submittedUser} />
       </InfiniteScroll>
     </Main>
   );
