@@ -162,7 +162,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const { t } = useTranslation(); // namespace 생략 (기본 common)
+  const { t, i18n } = useTranslation(); // namespace 생략 (기본 common)
+  const lng = i18n.language;  //현재 언어어
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,7 +253,7 @@ export default function Home() {
             <Link
               key={repo.id}
               href={{
-                pathname: `/repos/${repo.name}`,
+                pathname:`/${lng}/repos/${repo.name}`, //언어 포함
                 query: { user: submittedUser },
               }}
             >

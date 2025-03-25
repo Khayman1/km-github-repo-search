@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 type Props = {
   params: {
+    lng: string; 
     name: string;
   };
   searchParams: {
