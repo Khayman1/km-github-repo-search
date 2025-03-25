@@ -1,0 +1,15 @@
+{
+  "hello": "안녕하세요",
+  "welcome": "환영합니다",
+  "searchTitle": "GitHub 사용자 검색",
+  "searchPlaceholder": "GitHub 사용자명 입력",
+  "searchButton": "검색",
+  "sortUpdated": "최근 업데이트 순",
+  "sortStars": "별점 많은 순",
+  "allLanguages": "모든 언어",
+  "loading": "로딩 중...",
+  "errorOccurred": "에러가 발생했습니다.",
+  "retry": "다시 시도",
+  "endMessage": "모든 레포를 불러왔습니다.",
+  "lastUpdated": "마지막 업데이트"
+}

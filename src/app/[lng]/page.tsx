@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { getUserRepos } from '@/services/github';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from 'next/link';
-// import './i18n'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
 
 type Repo = {
@@ -17,7 +16,7 @@ type Repo = {
   language: string;
 };
 
-// 애니메이션 정의
+// 애니메이션 및 스타일 정의 생략 (기존과 동일)...
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -29,7 +28,6 @@ const fadeIn = keyframes`
   }
 `;
 
-// 전체 페이지 래퍼
 const Main = styled.main`
   min-height: 100vh;
   display: flex;
@@ -40,15 +38,6 @@ const Main = styled.main`
   animation: ${fadeIn} 0.8s ease;
 `;
 
-// 제목
-const Title = styled.h1`
-  font-size: 2.25rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  color: #0f172a;
-`;
-
-// 검색 폼
 const Form = styled.form`
   display: flex;
   gap: 0.75rem;
@@ -56,7 +45,6 @@ const Form = styled.form`
   animation: ${fadeIn} 1s ease;
 `;
 
-// 입력창
 const Input = styled.input`
   padding: 0.6rem 1rem;
   border: 1px solid #cbd5e1;
@@ -72,7 +60,6 @@ const Input = styled.input`
   }
 `;
 
-// 검색 버튼
 const Button = styled.button`
   padding: 0.6rem 1.2rem;
   background: linear-gradient(to right, #3b82f6, #60a5fa);
@@ -89,7 +76,6 @@ const Button = styled.button`
   }
 `;
 
-// 필터 영역
 const Filters = styled.div`
   display: flex;
   gap: 1rem;
@@ -111,7 +97,6 @@ const Select = styled.select`
   }
 `;
 
-// 레포지토리 리스트
 const RepoList = styled.ul`
   width: 100%;
   max-width: 40rem;
@@ -121,8 +106,7 @@ const RepoList = styled.ul`
   animation: ${fadeIn} 1.3s ease;
 `;
 
-// 레포 아이템 박스
-const RepoItem = styled.li`
+const RepoItem = styled.ul`
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
   padding: 1.2rem;
@@ -156,7 +140,6 @@ const RepoItem = styled.li`
   }
 `;
 
-// 일반 메시지
 const Message = styled.p`
   font-size: 0.9rem;
   color: #475569;
@@ -178,7 +161,8 @@ export default function Home() {
   const [languageFilter, setLanguageFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const { t } = useTranslation('translation');
+
+  const { t } = useTranslation(); // namespace 생략 (기본 common)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,17 +184,16 @@ export default function Home() {
         if (newRepos.length === 0) {
           setHasMore(false);
         }
-
         setRepos((prev) => [...prev, ...newRepos]);
       } catch (err: any) {
-        setError(err.message);
+        setError(t('errorOccurred'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchRepos();
-  }, [submittedUser, page]);
+  }, [submittedUser, page, t]);
 
   const filteredRepos = repos
     .filter((repo) =>
@@ -227,27 +210,25 @@ export default function Home() {
 
   return (
     <Main>
-      <Title>GitHub 사용자 검색</Title>
-
       <Form onSubmit={handleSubmit}>
         <Input
           type="text"
-          placeholder="GitHub 사용자명 입력"
+          placeholder={t('searchPlaceholder')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <Button type="submit">검색</Button>
+        <Button type="submit">{t('searchButton')}</Button>
       </Form>
 
       {repos.length > 0 && (
         <Filters>
           <Select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-            <option value="updated">최근 업데이트 순</option>
-            <option value="stars">별점 많은 순</option>
+            <option value="updated">{t('sortUpdated')}</option>
+            <option value="stars">{t('sortStars')}</option>
           </Select>
 
           <Select value={languageFilter} onChange={(e) => setLanguageFilter(e.target.value)}>
-            <option value="all">모든 언어</option>
+            <option value="all">{t('allLanguages')}</option>
             <option value="JavaScript">JavaScript</option>
             <option value="TypeScript">TypeScript</option>
             <option value="Python">Python</option>
@@ -256,15 +237,15 @@ export default function Home() {
         </Filters>
       )}
 
-      {loading && repos.length === 0 && <Message>로딩 중...</Message>}
+      {loading && repos.length === 0 && <Message>{t('loading')}</Message>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <InfiniteScroll
         dataLength={repos.length}
         next={() => setPage((prev) => prev + 1)}
         hasMore={hasMore}
-        loader={<Message></Message>}
-        endMessage={<Message>모든 레포를 불러왔습니다.</Message>}
+        loader={<Message />}
+        endMessage={<Message>{t('endMessage')}</Message>}
       >
         <RepoList>
           {filteredRepos.map((repo) => (
@@ -279,7 +260,7 @@ export default function Home() {
                 <h2>{repo.name}</h2>
                 <p>{repo.description}</p>
                 <div>
-                  ⭐ {repo.stargazers_count ?? 0} | 마지막 업데이트:{" "}
+                  ⭐ {repo.stargazers_count ?? 0} | {t('lastUpdated')}:{" "}
                   {new Date(repo.updated_at).toLocaleDateString()}
                 </div>
               </RepoItem>

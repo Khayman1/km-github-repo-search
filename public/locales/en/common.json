@@ -1,0 +1,15 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome",
+  "searchTitle": "GitHub User Search",
+  "searchPlaceholder": "Enter GitHub username",
+  "searchButton": "Search",
+  "sortUpdated": "Sort by Latest Update",
+  "sortStars": "Sort by Stars",
+  "allLanguages": "All Languages",
+  "loading": "Loading...",
+  "errorOccurred": "An error occurred.",
+  "retry": "Retry",
+  "endMessage": "All repositories have been loaded.",
+  "lastUpdated": "Last Updated"
+}
